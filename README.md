@@ -70,9 +70,16 @@ Visit `http://localhost:5500/` in your browser.
 
 ---
 
-## 🌈 Screenshots
+## 📸 Screenshots
 
-_Add screenshots of your UI here after deployment!_
+### 🏠 Homepage
+![Homepage](screenshots/homepage.png)
+
+### ⭐ Saving Favorite Example
+![Saving Favorite Example](screenshots/favorites.png)
+
+### 🔍 Search Example
+![Search Example](screenshots/search.png)
 
 ---
 
