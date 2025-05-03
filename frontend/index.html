@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Student Support Portal</title>
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧰</text></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+        }
+
+        @keyframes twinkle {
+            0% {
+                transform: scale(1) rotate(0deg);
+                opacity: 0.5;
+            }
+
+            25% {
+                transform: scale(1.3) rotate(-10deg);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.5) rotate(10deg);
+            }
+
+            75% {
+                transform: scale(1.3) rotate(-5deg);
+            }
+
+            100% {
+                transform: scale(1) rotate(0deg);
+            }
+        }
+
+        .twinkle {
+            animation: twinkle 0.5s ease-in-out;
+        }
+
+        @keyframes fadeSlideIn {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade-in {
+            animation: fadeSlideIn 0.5s ease-out;
+        }
+    </style>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+
+
+<body class="min-h-screen">
+    <main class="bg-gradient-to-b from-pink-300 via-yellow-200  to-sky-300 min-h-screen">
+        <div class="container mx-auto p-6">
+            <div style=" font-family: 'Nunito' , sans-serif;">
+                <h1 class="text-4xl font-semibold mb-6 text-gray-800">🐣 Student Resources</h1>
+
+                <!--Spotlight Resource-->
+                <div id="spotlight" class="mb-10"></div>
+
+                <!--Search Bar-->
+                <input type="text" id="searchInput" placeholder="Search by title or subject..."
+                    class="w-full md:w-1/2 p-3 mb-6 border border-gray-300 rounded" />
+
+                <!--Filter Buttons-->
+                <div id="subjectFilters" class="flex flex-wrap gap-2 mb-6">
+                    <button data-subject="All"
+                        class="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded font-semibold shadow-sm">
+                        🧰 All</button>
+                    <button data-subject="Math"
+                        class="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded font-semibold shadow-sm">➕ Math</button>
+                    <button data-subject="Literacy"
+                        class="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded font-semibold shadow-sm">📚
+                        Literacy</button>
+                    <button data-subject="Science"
+                        class="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded font-semibold shadow-sm">🔬
+                        Science</button>
+                    <button data-subject="Music"
+                        class="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded font-semibold shadow-sm">🎵
+                        Music</button>
+                    <button data-subject="Art"
+                        class="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded font-semibold shadow-sm">🎨 Art</button>
+                    <button data-subject="Health/PE"
+                        class="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded font-semibold shadow-sm">🧘
+                        Health/PE</button>
+                    <button data-subject="Autism-Friendly"
+                        class="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded font-semibold shadow-sm">🧩
+                        Autism-Friendly</button>
+                </div>
+
+                <!--Show Only Favorites Button-->
+                <div class="mb-6">
+                    <button id="toggleFavoritesBtn"
+                        class="bg-yellow-200 hover:bg-yellow-300 text-yellow-900 font-semibold px-4 py-2 rounded transition">
+                        Show Only Favorites ⭐
+                    </button>
+                </div>
+                <!--JS Logic-->
+                <div id="resources" class="space-y-4"></div>
+                <script>
+                    fetch('http://127.0.0.1:8000/api/resources/')
+                        .then(response => response.json())
+                        .then(data => {
+                            const resourcesDiv = document.getElementById('resources');
+                            const searchInput = document.getElementById("searchInput");
+                            const subjectButtons = document.querySelectorAll("#subjectFilters button");
+                            const toggleFavoritesBtn = document.getElementById("toggleFavoritesBtn");
+                            let showOnlyFavorites = false;
+                            const spotlightResource = data[Math.floor(Math.random() * data.length)];
+
+                            // Generate spotlight card
+                            const spotlightCard = `
+                                <div class="bg-white p-6 rounded-xl shadow-md border-l-4 border-blue-400 mb-6">
+                                    <h2 class="text-2xl font-bold text-blue-800 mb-2">🌟 Resource of the Day</h2>
+                                    <h3 class="text-xl font-semibold text-gray-800">${spotlightResource.title}</h3>
+                                    <p class="text-gray-600">${spotlightResource.description}</p>
+                                    <div class="flex flex-wrap gap-2 my-2">
+                                        <span class="bg-blue-100 text-blue-700 px-2 py-2 rounded-full text-sm">${spotlightResource.subject}</span>
+                                        <span class="bg-green-100 text-green-700 px-2 py-1 rounded-full text-sm">${spotlightResource.grade_level}</span>
+                                    </div>
+                                    <a href="${spotlightResource.url}" target="_blank"
+                                        class="inline-block mt-2 text-white bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded">
+                                        Explore Now →
+                                    </a>
+                                </div>
+                                `;
+
+                                // Inject it
+                                document.getElementById("spotlight").innerHTML = spotlightCard;
+
+                            let currentFilteredResources = data;
+
+                            subjectButtons.forEach(button => {
+                                button.addEventListener("click", () => {
+                                    const selected = button.getAttribute("data-subject").toLowerCase();
+                                    const filtered = selected === "all"
+                                        ? data
+                                        : data.filter(resource =>
+                                            resource.subject.toLowerCase().includes(selected)
+                                        );
+                                    currentFilteredResources = filtered;
+                                    renderResources(filtered);
+                                });
+                            });
+
+                            searchInput.addEventListener("input", () => {
+                                const query = searchInput.value.toLowerCase();
+                                const filtered = data.filter(resource =>
+                                    resource.title.toLowerCase().includes(query) ||
+                                    resource.subject.toLowerCase().includes(query)
+                                );
+                                currentFilteredResources = filtered;
+                                renderResources(filtered);
+                            });
+
+                            const subjectColors = {
+                                "Math": "bg-blue-50",
+                                "Literacy": "bg-purple-50",
+                                "Science": "bg-green-50",
+                                "Music": "bg-pink-50",
+                                "Art": "bg-red-50",
+                                "Health/PE": "bg-yellow-50",
+                                "Autism-Friendly": "bg-indigo-50",
+                                "Default": "bg-white"
+                            };
+
+                            function renderResources(filteredData) {
+                                resourcesDiv.innerHTML = "";
+
+                                const favorites = getFavorites();
+
+                                if (filteredData.length === 0) {
+                                    resourcesDiv.innerHTML = `
+                                        <div class="text-gray-600 text-lg">
+                                            No matching resources found.
+                                        </div>
+                                        `;
+                                    return;
+                                }
+                                // Group resources by subject
+                                const grouped = {};
+                                filteredData.forEach(resource => {
+                                    const subject = resource.subject;
+                                    if (!grouped[subject]) grouped[subject] = [];
+                                    grouped[subject].push(resource);
+                                });
+
+                                // Render grouped resources
+                                Object.keys(grouped).forEach(subject => {
+                                    resourcesDiv.innerHTML += `
+                                    <div class="bg-yellow-100 text-lg font-semibold text-gray-800 mt-10 mb-4 py-2 px-4 rounded shadow-inner inline-block">
+                                         — ${subject} Resources —
+                                    </div>
+                                `;
+
+                                    grouped[subject].forEach(resource => {
+                                        const isFavorite = favorites.includes(resource.id);
+                                        const firstSubject = resource.subject.split(",")[0].trim();
+                                        const baseColor = subjectColors[firstSubject] || subjectColors["Default"];
+                                        const favoriteClass = isFavorite ? "ring-2 ring-yellow-400 bg-yellow-50" : baseColor;
+                                        const isNew = new Date(resource.created_at) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+                                        const newBadge = isNew
+                                            ? `<span class="bg-red-100 text-red-700 text-xs font-semibold px-2 py-1 rounded-full animate-pulse ml-2">NEW!</span>`
+                                            : "";
+
+                                        const resourceCard = `
+                                    <div class="p-6 rounded-xl shadow-sm hover:shadow-md transition duration-300 space-y-2 ${favoriteClass} animate-fade-in">
+                                        <div class="flex justify-between items-start">
+                                            <h2 class="text-2xl font-bold text-gray-800">
+                                                ${resource.title} ${isFavorite ? "✨" : ""} ${newBadge}
+                                            </h2>
+                                            <button class="favorite-btn text-yellow-400 text-xl float-right transition transform duration-200 hover:scale-125 active:scale-90 drop-shadow-md hover:drop-shadow-lg"
+                                                data-id="${resource.id}">
+                                                ⭐
+                                            </button>
+                                        </div>
+                                        <p class="text-gray-600">${resource.description}</p>
+                                        <div class="flex flex-wrap gap-2">
+                                            <span class="bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-sm">${resource.subject}</span>
+                                            <span class="bg-green-100 text-green-700 px-2 py-1 rounded-full text-sm">${resource.grade_level}</span>
+                                        </div>
+                                        <a href="${resource.url}" target="_blank" rel="nonopener" class="inline-block mt-4 text-white bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded">
+                                            View Resource
+                                        </a>
+                                    </div>
+                                    `;
+                                        resourcesDiv.innerHTML += resourceCard;
+                                    });
+                                });
+
+                                // Scroll-to-to button logic
+                                const scrollTopBtn = document.getElementById("scrollTopBtn");
+
+                                window.addEventListener("scroll", () => {
+                                    scrollTopBtn.classList.toggle("hidden", window.scrollY < 300)
+                                });
+
+                                scrollTopBtn.addEventListener("click", () => {
+                                    window.scrollTo({ top: 0, behavior: "smooth" });
+                                });
+
+                                // Add favorite logic *after* DOM is updated
+                                const favoriteBtns = document.querySelectorAll(".favorite-btn");
+
+                                favoriteBtns.forEach(btn => {
+                                    const id = parseInt(btn.dataset.id);
+                                    btn.style.opacity = favorites.includes(id) ? "1" : "0.3";
+
+                                    btn.addEventListener("click", () => {
+                                        toggleFavorite(id);
+
+                                        // add twinkle animation
+                                        btn.classList.add("twinkle");
+                                        setTimeout(() => {
+                                            btn.classList.remove("twinkle");
+                                            toggleFavorite(id);
+                                            renderResources(currentFilteredResources);
+                                        }, 500);
+
+                                    });
+                                });
+                            }
+
+                            toggleFavoritesBtn.addEventListener("click", () => {
+                                showOnlyFavorites = !showOnlyFavorites;
+
+                                // Update button text
+                                toggleFavoritesBtn.textContent = showOnlyFavorites
+                                    ? "Show All Resources 📚"
+                                    : "Show Only Favorites ⭐";
+
+                                const favorites = getFavorites();
+
+                                const filtered = showOnlyFavorites
+                                    ? currentFilteredResources.filter(r => favorites.includes(r.id))
+                                    : currentFilteredResources;
+
+                                renderResources(filtered)
+                            })
+
+                            function getFavorites() {
+                                return JSON.parse(localStorage.getItem("favorites")) || [];
+                            }
+
+                            function toggleFavorite(id) {
+                                let favorites = getFavorites();
+                                if (favorites.includes(id)) {
+                                    favorites = favorites.filter(favId => favId !== id);
+                                } else {
+                                    favorites.push(id);
+                                }
+                                localStorage.setItem("favorites", JSON.stringify(favorites));
+                            }
+
+                            // Initial render
+                            if (data.length === 0) {
+                                resourcesDiv.innerHTML = `
+                                    <div class="text-gray-600 text-lg">
+                                        No resources available at this time. Please check back later!
+                                    </div>
+                                `;
+                            } else {
+                                currentFilteredResources = data;
+                                renderResources(data);
+                            }
+                        });
+                </script>
+                <footer class="text-center text-gray-500 mt-10">
+                    © 2025 Student Support Portal. All rights reserved.
+                </footer>
+            </div>
+        </div>
+    </main>
+    <button id="scrollTopBtn"
+        class="hidden fixed bottom-6 right-6 bg-blue-500 text-white p-3 rounded-full shadow-lg hover:bg-blue-600 transition duration-300">
+        ⬆️
+    </button>
+</body>
+
+</html>
