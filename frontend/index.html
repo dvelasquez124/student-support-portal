@@ -109,7 +109,8 @@
                 <!--JS Logic-->
                 <div id="resources" class="space-y-4"></div>
                 <script>
-                    fetch('http://127.0.0.1:8000/api/resources/')
+                    const apiBase = 'https://your-backend-url.onrender.com';
+                    fetch('${apiBase}/api/resources/')
                         .then(response => response.json())
                         .then(data => {
                             const resourcesDiv = document.getElementById('resources');
